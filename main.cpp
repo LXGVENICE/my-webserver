@@ -11,7 +11,6 @@
 #include <sys/socket.h>
 #include "HttpResponse.hpp"
 #include "Util.hpp"
-using namespace std;
 
 #define IP = "127.0.0.1";
 cosnt int PORT = 8000;
@@ -46,4 +45,26 @@ int main()
     }
 
     printf("listen %s:%d successed\n", IP, PORT);
+
+    int clientfd = -1;
+    while(1)
+    {
+        clientfd = accept(listenfd,NULL,0);
+        if(clientfd == -1)
+        {
+            perror("accept  failed");
+            exit(1);
+        }
+
+        printf("new connection is establish\n");
+
+        std::string line;
+        while(getline(line,clinetfd) != -1)
+        {
+            printf("%s\n",line.c_str());
+        }
+
+        HttpResponse rep(200);
+        rep.addH
+    }
 }
