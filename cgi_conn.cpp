@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <errno.h>
 #include <iostream>
 
 int Cgi_conn::m_epollfd = -1;
@@ -22,6 +23,7 @@ void Cgi_conn::process()
     do
     {
         ret = recv(m_sockfd,buf,sizeof(buf),0);
+        //printf("%d",ret);
         if(ret < 0)
         {
             perror("http response recv fail:");
@@ -32,13 +34,13 @@ void Cgi_conn::process()
         m_request.append(buf,ret);
         bzero(buf,sizeof(buf));
     }
-    while(ret > 0);
+    while((ret > 0) && (errno == EAGAIN));
     
     std::string head;
     while(ret != -1)
     {
         ret = m_request.get_next_line(head);
-        std::cout<<head;
+        std::cout<<head<<std::endl;
     }
     //if(ret)
     //removefd(m_epollfd,m_sockfd);

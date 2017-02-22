@@ -289,7 +289,7 @@ void ProcessPool::run_parent()
                             case SIGTERM:
                             case SIGINT:
                             {
-                                printf("kill all the child now\n");
+                                printf("\nkill all the child now\n");
                                 for(int i = 0;i < m_process_number;++i)
                                 {
                                     int pid = m_sub_process[i].m_pid;
