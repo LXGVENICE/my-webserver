@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include "HttpRequest.hpp"
+#include "processpool.hpp"
 
 class Cgi_conn
 {
@@ -14,7 +16,5 @@ private:
     //string m_recv_packet;
     //string m_send_packet;
     HttpRequest m_request;
-    HttpResponse m_response;
-}
-
-int Cgi_conn::m_epollfd = -1;
+    //HttpResponse m_response;//later
+};

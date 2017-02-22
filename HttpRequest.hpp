@@ -5,11 +5,11 @@
 class HttpRequest
 {
 public:
-    HttpRequest();
-    void append();
+    HttpRequest(){};
+    void append(char buf[],int ret);
     void clear();
-    int is_next_line();
+    int get_next_pos();
     int get_next_line(std::string &head);
 private:
-    stirng m_recv_parser;
+    std::string m_recv_parser;
 };

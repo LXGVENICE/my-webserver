@@ -11,7 +11,7 @@ void HttpRequest::clear()
     m_recv_parser.shrink_to_fit();
 }
 
-int HttpRequest::get_next_pos())
+int HttpRequest::get_next_pos()
 {
     if(m_recv_parser.empty()) 
         return -1;
@@ -26,7 +26,7 @@ int HttpRequest::get_next_line(std::string &head)
         head = "";
     else if(pos == 0)
     {
-        m_recv_parser.parse(0,2);
+        m_recv_parser.erase(0,2);
         head = m_recv_parser;
         m_recv_parser.shrink_to_fit();//??
     }

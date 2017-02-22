@@ -28,7 +28,7 @@ void Socket::CreateAddr(const char *ip,int port)
     _socketaddr.sin_port = htons(_port);
 }
 
-cosnt char* Socket::GetIP(){ return _ip; }
+const char* Socket::GetIP(){ return _ip; }
 
 int Socket::GetPort(){ return _port; }
 

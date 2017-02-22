@@ -6,8 +6,7 @@
 #include <sys/socket.h>
 #include <iostream>
 
-
-Cgi_conn::Cgi_conn()
+int Cgi_conn::m_epollfd = -1;
 
 void Cgi_conn::init(int epollfd,int sockfd)
 {
@@ -31,16 +30,16 @@ void Cgi_conn::process()
             return;
         }
         m_request.append(buf,ret);
-        bzero(buf,size(buf));
+        bzero(buf,sizeof(buf));
     }
-    while(len > 0);
+    while(ret > 0);
     
     std::string head;
     while(ret != -1)
     {
         ret = m_request.get_next_line(head);
-        std::cout<<head<<std::endl;
+        std::cout<<head;
     }
     //if(ret)
-
+    //removefd(m_epollfd,m_sockfd);
 }
