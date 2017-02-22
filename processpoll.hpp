@@ -32,9 +32,16 @@ private:
 class ProcessPool
 {
 private:
-    Processpool(int listenfd,int process_number = 5);
+    Processpool(int listenfd,int process_number = 8);
 public:
-    static ProcessPool create(int listenfd,int process_number = 5);
+    static ProcessPool* create(int listenfd,int process_number = 8)
+    {
+        if( m_instance == NULL)
+        {
+            m_instance = new ProcessPool(listenfd,process_number)
+        }
+        return m_instance;
+    }
     ~ProcessPool();
     void run();
 private:

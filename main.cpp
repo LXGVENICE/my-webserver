@@ -1,16 +1,6 @@
 #include <stdio.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <string>
-#include <strings.h>
-#include <sys/socket.h>
-
 #include "socket.hpp"
-
+#include "cgi_conn.h"
 
 int main()
 {
@@ -29,6 +19,14 @@ int main()
     }
     printf("listen %s:%d successed\n", serfd.GetIP(), serfd.GerPort());
 
-
-    while(1)
+    int listenfd = serfd.Getfd();
+    ProcessPool* pool = ProcessPool::create(listenfd);
+    if(pool == NULl)
+        printf("processpool created fail\n");
+    else
+    {
+        pool->run();
+        //delete pool;
+    }
+    //close()
 }

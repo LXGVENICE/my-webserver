@@ -30,6 +30,14 @@ ProcessPool::Processpool(int listenfd,int process_number)
     }
 }
 
+~ProcessPool()::~ProcessPool()
+{
+    delete []m_sub_process;
+    m_sub_process = NULL;
+    delete m_instance;
+    m_instance = NULL;
+}
+
 void ProcessPool::setup_sig_pipe()
 {
     m_epollfd = epoll_create(5);
@@ -96,7 +104,7 @@ void ProcessPool::run_child()
                         continue;
                     }
                     addfd(m_epollfd,connfd);
-                    users[connfd].init(m_epollfd,connfd);//!!
+                    users[connfd].init(m_epollfd,connfd);//////////////
                 }
             }
             else if((sockfd == sig_pipefd[0]) && (events[i].events & EPOLLIN))
@@ -188,7 +196,7 @@ void ProcessPool::run_parent()
                 }
                 sub_process_counter = (i+1)%m_process_number;
                 send(m_sub_process[i].m_pipefd[0],(char*)&new_conn,sizeof(new_conn),0);
-                printf("send request to child %d\n",i);
+                printf("send connect request to child %d\n",i);
             }
             else if((sockfd == sig_pipefd[0]) && (events.events & EPOLLIN))
             {
