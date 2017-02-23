@@ -19,7 +19,7 @@ static void addfd(int epollfd,int fd)
     event.data.fd = fd;
     event.events = EPOLLIN | EPOLLET;
     epoll_ctl(epollfd,EPOLL_CTL_ADD,fd,&event);
-    setnonblocking(fd);
+    setnonblocking(fd);//全部为非阻塞
 }
 
 static void removefd(int epollfd,int fd)

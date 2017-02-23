@@ -30,18 +30,17 @@ void Cgi_conn::process()
             m_request.clear();
             //m_http_packet.shrink_to_fit();
             return;
-        }
+        }m_response
         m_request.append(buf,ret);
         bzero(buf,sizeof(buf));
     }
     while((ret > 0) && (errno == EAGAIN));
     
-    std::string head;
-    while(ret != -1)
+    bool tag = true;
+    while(tag)
     {
-        ret = m_request.get_next_line(head);
-        std::cout<<head<<std::endl;
+        tag = m_response.parser(m_request.get_next_line(),m_request.get_line())
     }
-    //if(ret)
-    //removefd(m_epollfd,m_sockfd);
+
+    m_response.get_pkg()
 }

@@ -16,5 +16,5 @@ private:
     //string m_recv_packet;
     //string m_send_packet;
     HttpRequest m_request;
-    //HttpResponse m_response;//later
+    HttpResponse m_response;//later
 };

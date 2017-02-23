@@ -2,6 +2,11 @@
 #include <vector>
 #include <string>
 
+enum HTTPMethod{
+  GET, POST, DELETE, PUT, HEAD, 
+  INVAILD;
+}
+
 class HttpRequest
 {
 public:
@@ -10,6 +15,8 @@ public:
     void clear();
     int get_next_pos();
     int get_next_line(std::string &head);
+    std::stirng get_line();
 private:
-    std::string m_recv_parser;
+    std::string m_recv_packet;
+    std::string m_line;
 };
