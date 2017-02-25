@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <string>
 
 bool HttpResponse::parser(int ret,std::string line)
 {
@@ -16,6 +17,7 @@ bool HttpResponse::parser(int ret,std::string line)
     else if(ret > 0)
     {
         //tag = header_parser(line);
+        return true;
     }
     else
     {
@@ -26,7 +28,7 @@ bool HttpResponse::parser(int ret,std::string line)
 
 std::string HttpResponse::get_pkg()
 {
-    std:string pkg;
+    std::string pkg;
     pkg.append(m_first.c_str());
     pkg.append(CRFL);
     for (auto e : m_header) 
@@ -36,14 +38,15 @@ std::string HttpResponse::get_pkg()
       pkg.append(e.second);
       pkg.append(CRFL);
     }
-    rep.addHeader("Date", "Wed, 08 Feb 2017 12:21:00 GMT");
-    rep.addHeader("Content-Type", "text/html");
+    pkg.append("Date: Wed, 08 Feb 2017 12:21:00 GMT\r\n");
+    pkg.append("Content-Type: text/html\r\n");
     pkg.append(CRFL);
     pkg.append(m_body);
+    return pkg;
 }
 
 
-bool HttpResponse::first_parser(std::string line)
+bool HttpResponse::first_parser(std::string &line)
 {
     if(line.empty())
     {
@@ -52,7 +55,7 @@ bool HttpResponse::first_parser(std::string line)
     }
 
     int pos = line.find(" ");
-    if(strncmp(line.substr(0,pos),"GET",3) != 0)
+    if(strncmp(line.substr(0,pos).c_str(),"GET",3) != 0)
     {
         printf("not get\n");
         return false;
@@ -61,13 +64,13 @@ bool HttpResponse::first_parser(std::string line)
     line.erase(0,pos+1);
     pos = line.find(" ");
     m_resource = line.substr(0,pos);
-    m_m_protocol = PATH + line.substr(pos+2,line.length());
+    m_protocol = PATH + line.substr(pos+2,line.length());
 
     create_first();
     return true;
 }
 
-bool header_parser(std::string line)
+bool HttpResponse::header_parser(std::string &line)
 {
     if(line.empty())
     {
@@ -76,8 +79,7 @@ bool header_parser(std::string line)
     }
 
     int pos = line.find(": ");
-    m_header.insert(std::pair<std::string,std::string>(std::string(line.substr(0,pos)),
-                            std::string(line.substr(pos+2,line.length())));
+    m_header.insert(make_pair(line.substr(0,pos),line.substr(pos+2,line.length())));
     return true;
 }
 
@@ -88,8 +90,8 @@ void HttpResponse::create_first()
         printf("resourse and protocol empty\n"); 
         return;
     }
-    int fd = open(m_resourse.c_str(),O_RDONLY);
-    printf("open %s",(m_resourse.c_str());
+    int fd = open(m_resource.c_str(),O_RDONLY);
+    printf("open %s",m_resource.c_str());
 
     if(fd == -1)
     {
@@ -113,7 +115,7 @@ void HttpResponse::create_first()
             m_body.append(buf,ret);
         }
         m_state.set_code(200);
-        m_header[std::string(Content-Length)] = std::string(len);
+        m_header[std::string("Content-Length")] = std::to_string(len);
     }
     m_first = m_protocol + " " + m_state.get_state();
 }

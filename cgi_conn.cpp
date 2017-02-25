@@ -30,7 +30,7 @@ void Cgi_conn::process()
             m_request.clear();
             //m_http_packet.shrink_to_fit();
             return;
-        }m_response
+        }
         m_request.append(buf,ret);
         bzero(buf,sizeof(buf));
     }
@@ -39,8 +39,14 @@ void Cgi_conn::process()
     bool tag = true;
     while(tag)
     {
-        tag = m_response.parser(m_request.get_next_line(),m_request.get_line())
+        tag = m_response.parser(m_request.get_next_line(),m_request.get_line());
     }
 
-    m_response.get_pkg()
+    std::string pkg = m_response.get_pkg();
+    std::cout<<pkg<<std::endl;
+    ret = send(m_sockfd,pkg.data(),pkg.length(),0);
+    if(ret < 0)
+    {
+        perror("send fail\n");
+    }
 }

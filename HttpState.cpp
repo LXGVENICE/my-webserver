@@ -1,7 +1,7 @@
 #include "HttpState.hpp"
 
-std::unordered_map<HTTPState::CODE, std::string>
-HTTPState::_states = 
+std::unordered_map<HttpState::CODE, std::string>
+HttpState::m_state = 
 {
 	{ 100, "100 Continue" },
 	{ 101, "101 Switching Protocols" },

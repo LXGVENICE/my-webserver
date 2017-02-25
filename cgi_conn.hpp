@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
 #include "processpool.hpp"
 
 class Cgi_conn
