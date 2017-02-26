@@ -192,6 +192,7 @@ void ProcessPool::run_child()
             else if(events[i].events & EPOLLIN)
             {
                 users[sockfd].process();//以sockfd号客户处理程序,就不用穿sockfd了
+                removefd(m_epollfd,sockfd);///////v1.0
             }
             else
             {

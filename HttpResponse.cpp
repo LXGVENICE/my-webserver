@@ -6,13 +6,15 @@
 #include <unistd.h>
 #include <string.h>
 #include <string>
+#include <iostream>
 
 bool HttpResponse::parser(int ret,std::string line)
 {
     bool tag = false;
     if(ret == 0)
     {
-        tag = first_parser(line);
+        //tag = make_body(line);
+        return true;
     }
     else if(ret > 0)
     {
@@ -21,9 +23,8 @@ bool HttpResponse::parser(int ret,std::string line)
     }
     else
     {
-        tag = false;
+        return tag;;
     }
-    return tag;
 }
 
 std::string HttpResponse::get_pkg()
@@ -46,7 +47,7 @@ std::string HttpResponse::get_pkg()
 }
 
 
-bool HttpResponse::first_parser(std::string &line)
+bool HttpResponse::first_parser(std::string line)
 {
     if(line.empty())
     {
@@ -63,8 +64,13 @@ bool HttpResponse::first_parser(std::string &line)
 
     line.erase(0,pos+1);
     pos = line.find(" ");
-    m_resource = line.substr(0,pos);
-    m_protocol = PATH + line.substr(pos+2,line.length());
+    m_resource = PATH + line.substr(0,pos);
+    line.erase(0,pos+1);
+    printf("resourse:%s\n",m_resource.c_str());
+
+    pos = line.find(" ");
+    m_protocol = line.substr(pos+1,line.length());
+    printf("protocol:%s\n",m_protocol.c_str());
 
     create_first();
     return true;
@@ -95,7 +101,7 @@ void HttpResponse::create_first()
 
     if(fd == -1)
     {
-        perror("open file fail:");
+        perror("open file fail");
         m_state.set_code(404);
     }
     else
@@ -108,7 +114,7 @@ void HttpResponse::create_first()
             ret = read(fd,buf,1024);
             if(ret == -1)
             {
-                perror("read file fail:");
+                perror("read file fail");
                 exit(1);
             }
             len += ret;
@@ -118,4 +124,5 @@ void HttpResponse::create_first()
         m_header[std::string("Content-Length")] = std::to_string(len);
     }
     m_first = m_protocol + " " + m_state.get_state();
+    std::cout<<"first::"<<m_first<<std::endl;
 }

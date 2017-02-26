@@ -26,16 +26,20 @@ void Cgi_conn::process()
         //printf("%d",ret);
         if(ret < 0)
         {
-            perror("http response recv fail:");
+            perror("http response recv fail");
             m_request.clear();
             //m_http_packet.shrink_to_fit();
             return;
         }
         m_request.append(buf,ret);
         bzero(buf,sizeof(buf));
+        printf("%d\n",errno);
     }
     while((ret > 0) && (errno == EAGAIN));
     
+    if(m_request.get_next_line() == -1) return;
+    m_response.first_parser(m_request.get_line());
+
     bool tag = true;
     while(tag)
     {
@@ -47,6 +51,6 @@ void Cgi_conn::process()
     ret = send(m_sockfd,pkg.data(),pkg.length(),0);
     if(ret < 0)
     {
-        perror("send fail\n");
+        perror("send fail");
     }
 }

@@ -1,4 +1,5 @@
 #include "HttpRequest.hpp"
+#include <iostream>
 
 void HttpRequest::append(char buf[],int ret)
 {
@@ -21,19 +22,22 @@ int HttpRequest::get_next_pos()
 
 int HttpRequest::get_next_line()//pos 为 0 则为头,大于0 则为头部 ,-1 则为空
 {
-    int pos = get_next_pos();
-    if(m_recv_packet.empty() || pos == -1)
+    size_t pos = get_next_pos();
+    //printf("pos: %d\n",pos);
+    if(m_recv_packet.empty() || pos == std::string::npos)
         m_recv_packet = "";//////fix it's memory
     else if(pos == 0)
     {
         m_recv_packet.erase(0,2);
         m_line = m_recv_packet;
         m_recv_packet = "";
+        //std::cout<<"pos00:"<<m_line<<std::endl;
     }
     else
     {
         m_line = m_recv_packet.substr(0,pos);
         m_recv_packet.erase(0,pos+2);
+        //std::cout<<m_line<<std::endl;
     }
     return pos;
 }
