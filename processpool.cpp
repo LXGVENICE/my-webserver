@@ -121,7 +121,7 @@ void ProcessPool::run_child()
     int pipefd = m_sub_process[m_idx].m_pipefd[1];
     addfd(m_epollfd,pipefd);
 
-    epoll_event events[MAX_PROCESS_NUMBER];
+    epoll_event events[MAX_EVENT_NUMBER];
     Cgi_conn *users = new Cgi_conn[USER_PER_PROCESS];
     assert(users != NULL);
     int number = 0;
@@ -220,7 +220,7 @@ void ProcessPool::run_parent()
     while( !m_stop )
     {
         number = epoll_wait(m_epollfd,events,MAX_EVENT_NUMBER,-1);
-        //printf("epoll num = %d\n",number);
+        //printf("ffepoll num = %d\n",number);
         if((number < 0) && (errno != EINTR))
         {
             printf("epoll fail\n");
