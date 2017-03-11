@@ -192,8 +192,8 @@ void ProcessPool::run_child()
             }
             else if(events[i].events & EPOLLIN)
             {
-                run_status res = users[sockfd].process();//以sockfd号客户处理程序,就不用穿sockfd了
-                if(res.keep_alive == false) removefd(m_epollfd,sockfd);///////v1.1
+                users[sockfd].process();//以sockfd号客户处理程序,就不用穿sockfd了
+                removefd(m_epollfd,sockfd);///////v1.1
             }
             else
             {

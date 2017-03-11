@@ -15,6 +15,7 @@
 class HttpResponse
 {
 public:
+    HttpResponse():keep_alive(true){}
     bool parser(int ret,std::string line);
     bool first_parser(std::string line);
     std::string get_pkg();

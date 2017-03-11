@@ -16,7 +16,7 @@ public:
     Cgi_conn(){}
     ~Cgi_conn(){}
     void init(int epollfd,int sockfd);
-    run_status process();//建议返回一个结构体,改
+    void process();//建议返回一个结构体,改
 private:
     static int m_epollfd;
     int m_sockfd;

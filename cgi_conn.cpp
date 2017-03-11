@@ -15,55 +15,49 @@ void Cgi_conn::init(int epollfd,int sockfd)
     m_sockfd = sockfd;
 }
 
-run_status Cgi_conn::process()
+void Cgi_conn::process()
 {
-    run_status info;
+    //run_status info;
     printf("new connetion has benn estabilshed\n");
     char buf[1024] = {0};
-    int ret = 0;
-    do
+    while(m_response.is_keep_alive())
     {
-        ret = recv(m_sockfd,buf,sizeof(buf),0);
-        if(((ret < 0) && (errno != EAGAIN)) || ret == 0)
+        int ret = 0;
+        do
         {
-            perror("http response recv fail");
-            m_request.clear();
-            //m_http_packet.shrink_to_fit();
-            info.status = false;
-            return info;
+            ret = recv(m_sockfd,buf,sizeof(buf),0);
+            if(((ret < 0) && (errno != EAGAIN)) || ret == 0)
+            {
+                perror("http response recv fail");
+               m_request.clear();
+               //m_http_packet.shrink_to_fit();
+               return;
+            }
+            m_request.append(buf,ret);
+            bzero(buf,sizeof(buf));
         }
-        m_request.append(buf,ret);
-        bzero(buf,sizeof(buf));
-    }
-    while((ret > 0) && (ret < 1024));
+        while((ret > 0) && (ret < 1024));
     
-    if(m_request.get_next_line() == -1)
-    {
-        info.status = false;
-        return info;
-    }
-    if(!m_response.first_parser(m_request.get_line()))
-    {
-        printf("http request first line errno\n");
-        info.status = false;
-        return info;
-    }
+        if(m_request.get_next_line() == -1)
+            return;
+        if(!m_response.first_parser(m_request.get_line()))
+        {
+            printf("http request first line errno\n");
+            return;
+        }
 
-    bool tag = true;
-    while(tag)
-    {
-        tag = m_response.parser(m_request.get_next_line(),m_request.get_line());
-    }
+        bool tag = true;
+        while(tag)
+        {
+            tag = m_response.parser(m_request.get_next_line(),m_request.get_line());
+        }
 
-    std::string pkg = m_response.get_pkg();
-    std::cout<<pkg<<std::endl;
-    ret = send(m_sockfd,pkg.data(),pkg.length(),0);
-    if(ret < 0)
-    {
-        perror("send fail");
+        std::string pkg = m_response.get_pkg();
+        std::cout<<pkg<<std::endl;
+        ret = send(m_sockfd,pkg.data(),pkg.length(),0);
+        if(ret < 0)
+        {
+            perror("send fail");
+        }
     }
-
-    info.status = true;
-    info.keep_alive = m_response.is_keep_alive();
-    return info;
 }
