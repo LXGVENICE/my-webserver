@@ -11,15 +11,23 @@
 bool HttpResponse::parser(int ret,std::string line)
 {
     bool tag = false;
+
+    if(line.empty())
+    {
+        printf("line empty\n");
+        return tag;
+    }
+    
     if(ret == 0)
     {
-        //tag = make_body(line);
+        //tag = body_parser(line);
         return true;
     }
     else if(ret > 0)
     {
-        //tag = header_parser(line);
-        return true;
+        //m_header.insert(make_pair(line.substr(0,pos),line.substr(pos+2,line.length())));
+        tag = header_parser(line);
+        return tag;
     }
     else
     {
@@ -64,12 +72,12 @@ bool HttpResponse::first_parser(std::string line)
 
     line.erase(0,pos+1);
     pos = line.find(" ");
+    if(pos == -1) return false;
     m_resource = PATH + line.substr(0,pos);
     line.erase(0,pos+1);
     printf("resourse:%s\n",m_resource.c_str());
 
-    pos = line.find(" ");
-    m_protocol = line.substr(pos+1,line.length());
+    m_protocol = line;
     printf("protocol:%s\n",m_protocol.c_str());
 
     create_first();
@@ -85,7 +93,17 @@ bool HttpResponse::header_parser(std::string &line)
     }
 
     int pos = line.find(": ");
-    m_header.insert(make_pair(line.substr(0,pos),line.substr(pos+2,line.length())));
+    if(pos == -1) return false;
+
+    std::string key = line.substr(0,pos);
+    std::string value = line.substr(pos+2,line.length());
+    if(key == "Connection")
+    {
+        if(value == "keep-alive")
+            keep_alive = true;
+        else
+            keep_alive = false;
+    }
     return true;
 }
 
@@ -124,5 +142,4 @@ void HttpResponse::create_first()
         m_header[std::string("Content-Length")] = std::to_string(len);
     }
     m_first = m_protocol + " " + m_state.get_state();
-    std::cout<<"first::"<<m_first<<std::endl;
 }

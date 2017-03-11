@@ -18,13 +18,15 @@ public:
     bool parser(int ret,std::string line);
     bool first_parser(std::string line);
     std::string get_pkg();
+    bool is_keep_alive(){ return keep_alive; }
 private:
     bool header_parser(std::string &line);
     void create_first();
 private:
-    HttpState m_state;
-    std::string m_protocol;
-    std::string m_resource;
+    HttpState m_state;//HTTP状态码
+    std::string m_protocol;//HTTP协议版本
+    std::string m_resource;//HTTP请求资源
+    bool keep_alive;
     std::string m_first;
     std::unordered_map<std::string,std::string> m_header;
     std::string m_body;

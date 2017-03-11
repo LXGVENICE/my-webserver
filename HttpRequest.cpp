@@ -3,7 +3,10 @@
 
 void HttpRequest::append(char buf[],int ret)
 {
-    m_recv_packet.append(buf,ret);
+    if(ret < 0) 
+        return;
+    else
+        m_recv_packet.append(buf,ret);
 }
 
 void HttpRequest::clear()
@@ -20,7 +23,7 @@ int HttpRequest::get_next_pos()
         return m_recv_packet.find("\r\n");
 }
 
-int HttpRequest::get_next_line()//pos 为 0 则为头,大于0 则为头部 ,-1 则为空
+int HttpRequest::get_next_line()//pos 为 0 则为request的body,大于0 则为头部 ,-1 则为空
 {
     size_t pos = get_next_pos();
     //printf("pos: %d\n",pos);
