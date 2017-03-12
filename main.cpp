@@ -6,6 +6,7 @@
 int main()
 {
     Socket serfd;
+    serfd.Setsockopt(32);
     serfd.CreateAddr("127.0.0.1",8080);
     if(!serfd.Bind())
     {

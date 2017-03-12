@@ -32,6 +32,13 @@ const char* Socket::GetIP(){ return _ip; }
 
 int Socket::GetPort(){ return _port; }
 
+int Socket::Setsockopt(int size)
+{
+    //设置缓冲区为size k
+    size = size * 1024;
+    return setsockopt(_sockfd,SOL_SOCKET,SO_REUSEADDR,(const char*)&size,sizeof(int));
+}
+
 bool Socket::Bind()
 {
     if(bind(_sockfd,(struct sockaddr*)&_socketaddr,sizeof(_socketaddr)) == -1)

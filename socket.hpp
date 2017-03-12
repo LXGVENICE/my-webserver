@@ -11,6 +11,7 @@ public:
     int Getfd();
     const char* GetIP();
     int GetPort();
+    int Setsockopt(int size);
     bool Bind();
     bool Listen(int num);
     int Accept();
