@@ -73,7 +73,10 @@ bool HttpResponse::first_parser(std::string line)
     line.erase(0,pos+1);
     pos = line.find(" ");
     if(pos == -1) return false;
-    m_resource = PATH + line.substr(0,pos);
+    if(line.substr(0,pos) == "/")
+        m_resource = PATH + std::string("/index.html");
+    else
+        m_resource = PATH + line.substr(0,pos);
     line.erase(0,pos+1);
     printf("resourse:%s\n",m_resource.c_str());
 
@@ -121,25 +124,30 @@ void HttpResponse::create_first()
     {
         perror("open file fail");
         m_state.set_code(404);
+        m_resource = PATH + std::string("/errno.html");
+        fd = open(m_resource.c_str(),O_RDONLY);
     }
     else
     {
-        int len = 0;
-        int ret = 1;
-        char buf[1024] = {0};
-        while(ret > 0)
-        {
-            ret = read(fd,buf,1024);
-            if(ret == -1)
-            {
-                perror("read file fail");
-                exit(1);
-            }
-            len += ret;
-            m_body.append(buf,ret);
-        }
         m_state.set_code(200);
-        m_header[std::string("Content-Length")] = std::to_string(len);
     }
+
+    int len = 0;
+    int ret = 1;
+    char buf[1024] = {0};
+    while(ret > 0)
+    {
+        ret = read(fd,buf,1024);
+        if(ret == -1)
+        {
+            perror("read file fail");
+            exit(1);
+        }
+        len += ret;
+        m_body.append(buf,ret);
+    }
+    
+    m_header[std::string("Content-Length")] = std::to_string(len);
+    
     m_first = m_protocol + " " + m_state.get_state();
 }

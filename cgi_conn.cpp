@@ -15,49 +15,55 @@ void Cgi_conn::init(int epollfd,int sockfd)
     m_sockfd = sockfd;
 }
 
-void Cgi_conn::process()
+run_status Cgi_conn::process()
 {
-    //run_status info;
-    printf("new connetion has benn estabilshed\n");
+    run_status info = {true,false};
+    printf("new connetion has been estabilshed\n");
     char buf[1024] = {0};
-    while(m_response.is_keep_alive())
+
+    int ret = 0;
+    do
     {
-        int ret = 0;
-        do
+        ret = recv(m_sockfd,buf,sizeof(buf),0);
+        if(((ret < 0) && (errno != EAGAIN)) || ret == 0)
         {
-            ret = recv(m_sockfd,buf,sizeof(buf),0);
-            if(((ret < 0) && (errno != EAGAIN)) || ret == 0)
-            {
-                perror("http response recv fail");
-               m_request.clear();
-               //m_http_packet.shrink_to_fit();
-               return;
-            }
-            m_request.append(buf,ret);
-            bzero(buf,sizeof(buf));
+            perror("http response recv fail");
+            m_request.clear();
+            info.status = false;
+            info.alive = false;
+            return info;
         }
-        while((ret > 0) && (ret < 1024));
-    
-        if(m_request.get_next_line() == -1)
-            return;
-        if(!m_response.first_parser(m_request.get_line()))
-        {
-            printf("http request first line errno\n");
-            return;
-        }
-
-        bool tag = true;
-        while(tag)
-        {
-            tag = m_response.parser(m_request.get_next_line(),m_request.get_line());
-        }
-
-        std::string pkg = m_response.get_pkg();
-        std::cout<<pkg<<std::endl;
-        ret = send(m_sockfd,pkg.data(),pkg.length(),0);
-        if(ret < 0)
-        {
-            perror("send fail");
-        }
+        m_request.append(buf,ret);
+        bzero(buf,sizeof(buf));
     }
+    while((ret > 0) && (ret < 1024));
+    
+    if(m_request.get_next_line() == -1)
+    {
+        info.status = false;
+        info.alive = false;
+        return info;
+    }
+
+    if(!m_response.first_parser(m_request.get_line()))
+    {
+        printf("http request first line errno\n");
+        info.status = false;
+        info.alive = false;
+        return info;
+    }
+
+    std::string pkg = m_response.get_pkg();
+    std::cout<<pkg<<std::endl;
+    ret = send(m_sockfd,pkg.data(),pkg.length(),0);
+    if(ret < 0)
+    {
+            perror("send fail");
+            info.status = false;
+            info.alive = false;
+            return info;
+    }
+    info.status = true;
+    info.alive = m_response.is_keep_alive();
+    return info;
 }
