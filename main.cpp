@@ -23,7 +23,7 @@ int main()
 
     int listenfd = serfd.Getfd();
 
-    ProcessPool* pool = ProcessPool::create(listenfd);
+    ProcessPool* pool = ProcessPool::create(listenfd,1);
     if(pool == NULL)
         printf("processpool created fail\n");
     else

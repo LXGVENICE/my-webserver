@@ -18,12 +18,13 @@ void Cgi_conn::init(int epollfd,int sockfd)
 run_status Cgi_conn::process()
 {
     run_status info = {true,false};
-    printf("new connetion has been estabilshed\n");
     char buf[1024] = {0};
 
     int ret = 0;
     do
     {
+        m_request.append(buf,ret);
+        bzero(buf,sizeof(buf));
         ret = recv(m_sockfd,buf,sizeof(buf),0);
         if(((ret < 0) && (errno != EAGAIN)) || ret == 0)
         {
@@ -33,10 +34,10 @@ run_status Cgi_conn::process()
             info.alive = false;
             return info;
         }
-        m_request.append(buf,ret);
-        bzero(buf,sizeof(buf));
     }
-    while((ret > 0) && (ret < 1024));
+    while(ret > 0);
+
+    
     
     if(m_request.get_next_line() == -1)
     {
@@ -65,5 +66,8 @@ run_status Cgi_conn::process()
     }
     info.status = true;
     info.alive = m_response.is_keep_alive();
+    m_request.clear();
+    m_response.clear();
+    printf("-------------\n");
     return info;
 }

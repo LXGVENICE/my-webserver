@@ -9,6 +9,16 @@
 #include <string>
 #include <iostream>
 
+
+void HttpResponse::clear()
+{
+    m_protocol.clear();//HTTP协议版本
+    m_resource.clear();//HTTP请求资源
+    m_first.clear();
+    m_header.clear();
+    m_body.clear();
+}
+
 bool HttpResponse::parser(int ret,std::string line)
 {
     bool tag = false;
@@ -50,6 +60,7 @@ std::string HttpResponse::set_time()
         case 5:gtime.append("Fri, ");break;
         case 6:gtime.append("Sat, ");break;
         case 0:gtime.append("Sun, ");break;
+        default:break;
     }
     gtime.append(std::to_string(p->tm_mday));
     switch(p->tm_mon)
@@ -66,6 +77,7 @@ std::string HttpResponse::set_time()
         case 9:gtime.append(" Oct ");break;
         case 10:gtime.append(" Nov ");break;
         case 11:gtime.append(" Dec ");break;
+        default:break;
     }
     gtime.append(std::to_string(p->tm_year+1900));
     gtime += " " + std::to_string(p->tm_hour) + ":" + std::to_string(p->tm_min) + ":" + std::to_string(p->tm_sec) + " GMT\r\n";
@@ -95,6 +107,7 @@ std::string HttpResponse::get_pkg()
 
 bool HttpResponse::first_parser(std::string line)
 {
+    std::cout<<"first_parser:"<<line<<std::endl;
     if(line.empty())
     {
         printf("line empty\n");
@@ -156,7 +169,7 @@ void HttpResponse::create_first()
         return;
     }
     int fd = open(m_resource.c_str(),O_RDONLY);
-    printf("open %s",m_resource.c_str());
+    printf("open %s\n",m_resource.c_str());
 
     if(fd == -1)
     {

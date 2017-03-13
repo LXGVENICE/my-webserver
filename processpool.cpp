@@ -130,7 +130,7 @@ void ProcessPool::run_child()
     while( !m_stop )
     {
         number = epoll_wait(m_epollfd,events,MAX_EVENT_NUMBER,-1);
-        //printf("epoll num = %d\n",number);
+        printf("child epoll num = %d\n",number);
         if((number < 0) && (errno != EINTR))
         {
             printf("epoll fail\n");
@@ -140,6 +140,7 @@ void ProcessPool::run_child()
         for(int i = 0;i < number;++i)
         {
             int sockfd = events[i].data.fd;
+            printf("fd:%d\n",sockfd);
             if((sockfd == pipefd) && (events[i].events & EPOLLIN))
             {
                 int client = 0;
@@ -156,6 +157,7 @@ void ProcessPool::run_child()
                     }
                     addfd(m_epollfd,connfd);
                     users[connfd].init(m_epollfd,connfd);//////////////
+                    printf("sockfd:%d--new connetion has been estabilshed\n",sockfd);
                 }
             }
             else if((sockfd == sig_pipefd[0]) && (events[i].events & EPOLLIN))
@@ -193,8 +195,11 @@ void ProcessPool::run_child()
             else if(events[i].events & EPOLLIN)
             {
                 run_status ret = users[sockfd].process();//以sockfd号客户处理程序,就不用穿sockfd了
-                if((ret.status == false) || (ret.alive == true))
-                    removefd(m_epollfd,sockfd);///////v1.1
+                if((ret.status == false) || (ret.alive == false))
+                {
+                    printf("one client has leave\n");
+                    removefd(m_epollfd,sockfd);/////n//v1.1
+                }
             }
             else
             {
@@ -221,8 +226,8 @@ void ProcessPool::run_parent()
 
     while( !m_stop )
     {
-        number = epoll_wait(m_epollfd,events,MAX_EVENT_NUMBER,-1);
-        //printf("ffepoll num = %d\n",number);
+        number = epoll_wait(m_epollfd,events,MAX_EVENT_NUMBER,-1);//-1会阻塞在此
+        printf("parent epoll num = %d\n",number);
         if((number < 0) && (errno != EINTR))
         {
             printf("epoll fail\n");
@@ -250,7 +255,7 @@ void ProcessPool::run_parent()
                 }
                 sub_process_counter = (i+1)%m_process_number;
                 send(m_sub_process[i].m_pipefd[0],(char*)&new_conn,sizeof(new_conn),0);
-                printf("send connect request to child %d\n",i);
+                printf("send connect request to child %d\n",i+1);
             }
             else if((sockfd == sig_pipefd[0]) && (events[i].events & EPOLLIN))
             {

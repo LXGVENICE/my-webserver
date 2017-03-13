@@ -20,6 +20,7 @@ public:
     bool first_parser(std::string line);
     std::string get_pkg();
     bool is_keep_alive(){ return keep_alive; }
+    void clear();
 private:
     bool header_parser(std::string &line);
     void create_first();
