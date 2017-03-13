@@ -1,4 +1,5 @@
 #include "HttpResponse.hpp"
+#include <time.h>
 #include <utility>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -35,6 +36,42 @@ bool HttpResponse::parser(int ret,std::string line)
     }
 }
 
+std::string HttpResponse::set_time()
+{
+    std::string gtime = "Date: ";
+    time_t timep = time(NULL);
+    struct tm* p = gmtime(&timep);
+    switch(p->tm_wday)
+    {
+        case 1:gtime.append("Mon, ");break;
+        case 2:gtime.append("Tues, ");break;
+        case 3:gtime.append("Wed, ");break;
+        case 4:gtime.append("Thur, ");break;
+        case 5:gtime.append("Fri, ");break;
+        case 6:gtime.append("Sat, ");break;
+        case 0:gtime.append("Sun, ");break;
+    }
+    gtime.append(std::to_string(p->tm_mday));
+    switch(p->tm_mon)
+    {
+        case 0:gtime.append(" Jan ");break;
+        case 1:gtime.append(" Feb ");break;
+        case 2:gtime.append(" Mar ");break;
+        case 3:gtime.append(" Apr ");break;
+        case 4:gtime.append(" May ");break;
+        case 5:gtime.append(" Jun ");break;
+        case 6:gtime.append(" Jul ");break;
+        case 7:gtime.append(" Aug ");break;
+        case 8:gtime.append(" Sep ");break;
+        case 9:gtime.append(" Oct ");break;
+        case 10:gtime.append(" Nov ");break;
+        case 11:gtime.append(" Dec ");break;
+    }
+    gtime.append(std::to_string(p->tm_year+1900));
+    gtime += " " + std::to_string(p->tm_hour) + ":" + std::to_string(p->tm_min) + ":" + std::to_string(p->tm_sec) + " GMT\r\n";
+    return gtime; 
+}
+
 std::string HttpResponse::get_pkg()
 {
     std::string pkg;
@@ -47,7 +84,8 @@ std::string HttpResponse::get_pkg()
       pkg.append(e.second);
       pkg.append(CRFL);
     }
-    pkg.append("Date: Wed, 08 Feb 2017 12:21:00 GMT\r\n");
+    
+    pkg.append(set_time());
     pkg.append("Content-Type: text/html\r\n");
     pkg.append(CRFL);
     pkg.append(m_body);

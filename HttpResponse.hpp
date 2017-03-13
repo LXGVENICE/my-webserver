@@ -23,6 +23,7 @@ public:
 private:
     bool header_parser(std::string &line);
     void create_first();
+    std::string set_time();
 private:
     HttpState m_state;//HTTP状态码
     std::string m_protocol;//HTTP协议版本
