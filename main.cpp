@@ -7,7 +7,7 @@ int main()
 {
     Socket serfd;
     serfd.Setsockopt(32);
-    serfd.CreateAddr("127.0.0.1",8080);
+    serfd.CreateAddr("10.154.156.125",80);
     if(!serfd.Bind())
     {
         perror("bind failed:");
@@ -23,7 +23,7 @@ int main()
 
     int listenfd = serfd.Getfd();
 
-    ProcessPool* pool = ProcessPool::create(listenfd,1);
+    ProcessPool* pool = ProcessPool::create(listenfd,8);
     if(pool == NULL)
         printf("processpool created fail\n");
     else

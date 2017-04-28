@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include "HttpState.hpp"
 
-#define PATH "/home/venice/web-server/html"
+#define PATH "/home/ubuntu/my-webserver/html"
 #define CRFL "\r\n"
 
 //enum HTTPMethod
